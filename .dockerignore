@@ -1,0 +1,10 @@
+notebooks/
+data/
+catboost_info/
+tests/
+.git/
+__pycache__/
+*.pyc
+.venv/
+venv/
+README.md
