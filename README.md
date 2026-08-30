@@ -26,24 +26,26 @@ German Credit Data (Statlog), 1000 заявителей, 19 фичей (кате
 Гиперпараметры подобраны через `RandomizedSearchCV` (5-fold CV, 30 итераций). SHAP-анализ показал самых сильных предикторов: `account_balance`, `value_savings_stocks`, `duration_of_credit_monthly` — совпадает с бизнес-интуицией скоринга.
 
 ## Структура проекта
+```text
 credit-scoring-api/
 ├── app/
-│ ├── main.py # FastAPI-приложение, эндпоинты /predict и /health
-│ ├── schemas.py # Pydantic-модели запроса/ответа
-│ ├── model_loader.py # Загрузка и кэширование модели CatBoost
-│ └── config.py # Пути, пороги, порядок колонок
+│   ├── main.py           # FastAPI-приложение, эндпоинты /predict и /health
+│   ├── schemas.py        # Pydantic-модели запроса/ответа
+│   ├── model_loader.py   # Загрузка и кэширование модели CatBoost
+│   └── config.py         # Пути, пороги, порядок колонок
 ├── data/
-│ ├── raw/ # Исходный датасет
-│ └── processed/ # Обработанный датасет для обучения
-├── models/ # Обученная модель CatBoost (.cbm)
+│   ├── raw/               # Исходный датасет
+│   └── processed/         # Обработанный датасет для обучения
+├── models/                 # Обученная модель CatBoost (.cbm)
 ├── notebooks/
-│ ├── 01_EDA.ipynb # Разведочный анализ данных
-│ └── 02_modeling.ipynb # Baseline, CatBoost, тюнинг, SHAP
+│   ├── 01_EDA.ipynb        # Разведочный анализ данных
+│   └── 02_modeling.ipynb   # Baseline, CatBoost, тюнинг, SHAP
 ├── tests/
-│ └── test_api.py # Тесты API (pytest)
+│   └── test_api.py         # Тесты API (pytest)
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
+```
 
 ## Запуск локально
 

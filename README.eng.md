@@ -26,25 +26,26 @@ The `foreign_worker` column was dropped during EDA as a protected attribute, for
 Hyperparameters were tuned via `RandomizedSearchCV` (5-fold CV, 30 iterations). SHAP analysis identified `account_balance`, `value_savings_stocks`, and `duration_of_credit_monthly` as the strongest predictors — consistent with domain intuition for credit scoring.
 
 ## Project Structure
+```text
 credit-scoring-api/
 ├── app/
-│ ├── main.py # FastAPI app, /predict and /health endpoints
-│ ├── schemas.py # Pydantic request/response models
-│ ├── model_loader.py # Loads and caches the CatBoost model
-│ └── config.py # Paths, thresholds, column order
+│   ├── main.py           # FastAPI-приложение, эндпоинты /predict и /health
+│   ├── schemas.py        # Pydantic-модели запроса/ответа
+│   ├── model_loader.py   # Загрузка и кэширование модели CatBoost
+│   └── config.py         # Пути, пороги, порядок колонок
 ├── data/
-│ ├── raw/ # Original dataset
-│ └── processed/ # Cleaned dataset used for training
-├── models/ # Trained CatBoost model (.cbm)
+│   ├── raw/               # Исходный датасет
+│   └── processed/         # Обработанный датасет для обучения
+├── models/                 # Обученная модель CatBoost (.cbm)
 ├── notebooks/
-│ ├── 01_EDA.ipynb # Exploratory data analysis
-│ └── 02_modeling.ipynb # Baseline, CatBoost, tuning, SHAP
+│   ├── 01_EDA.ipynb        # Разведочный анализ данных
+│   └── 02_modeling.ipynb   # Baseline, CatBoost, тюнинг, SHAP
 ├── tests/
-│ └── test_api.py # API tests (pytest)
+│   └── test_api.py         # Тесты API (pytest)
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
-
+```
 
 
 ## Running Locally
