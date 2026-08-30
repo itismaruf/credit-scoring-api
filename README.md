@@ -1,68 +1,66 @@
 # Credit Scoring API
 
-A machine learning service that predicts credit risk (good/bad) for loan applicants, built end-to-end from EDA to a containerized REST API.
+ML-сервис, предсказывающий кредитоспособность заёмщика (хороший/плохой риск), построенный от EDA до контейнеризированного REST API.
 
-## Overview
+## Описание
 
-This project implements a binary credit scoring model on the German Credit Data dataset, with a focus on **recall for the "bad" credit class** — in lending, approving a bad loan is more costly than rejecting a good applicant. The final model is served through a FastAPI application, containerized with Docker.
+Проект реализует бинарную модель кредитного скоринга на датасете German Credit Data, с упором на **recall для класса "bad"** — в кредитовании выдать плохой кредит дороже, чем отказать хорошему заёмщику. Финальная модель обёрнута в FastAPI-сервис, контейнеризирована через Docker.
 
-**Pipeline:** EDA → baseline modeling → CatBoost tuning → SHAP interpretation → feature engineering → FastAPI service → Docker
+**Пайплайн:** EDA → baseline-модели → тюнинг CatBoost → интерпретация через SHAP → feature engineering → FastAPI-сервис → Docker
 
-## Dataset
+## Датасет
 
-German Credit Data (Statlog), 1000 applicants, 19 features (categorical + numeric) plus target `creditability` (1 = good, 0 = bad). Class distribution is imbalanced (~700 good / ~300 bad).
+German Credit Data (Statlog), 1000 заявителей, 19 фичей (категориальные + числовые) плюс таргет `creditability` (1 = good, 0 = bad). Классы несбалансированы (~700 good / ~300 bad).
 
-The `foreign_worker` column was dropped during EDA as a protected attribute, for fairness reasons rather than data leakage.
+Колонка `foreign_worker` была удалена на этапе EDA как защищённый атрибут — по соображениям справедливости, а не как утечка данных.
 
-## Model Performance
+## Качество моделей
 
-| Model | Recall (bad) | Precision (bad) | ROC-AUC |
+| Модель | Recall (bad) | Precision (bad) | ROC-AUC |
 |---|---|---|---|
 | Logistic Regression (baseline, balanced) | 0.77 | 0.54 | 0.8294 |
 | CatBoost (default) | 0.43 | 0.67 | 0.8324 |
 | CatBoost (balanced class weights) | 0.67 | 0.62 | 0.8285 |
-| **CatBoost (tuned, final model)** | **0.67** | **0.62** | **0.8335** |
+| **CatBoost (tuned, финальная модель)** | **0.67** | **0.62** | **0.8335** |
 
-Hyperparameters were tuned via `RandomizedSearchCV` (5-fold CV, 30 iterations). SHAP analysis identified `account_balance`, `value_savings_stocks`, and `duration_of_credit_monthly` as the strongest predictors — consistent with domain intuition for credit scoring.
+Гиперпараметры подобраны через `RandomizedSearchCV` (5-fold CV, 30 итераций). SHAP-анализ показал самых сильных предикторов: `account_balance`, `value_savings_stocks`, `duration_of_credit_monthly` — совпадает с бизнес-интуицией скоринга.
 
-## Project Structure
+## Структура проекта
 credit-scoring-api/
 ├── app/
-│ ├── main.py # FastAPI app, /predict and /health endpoints
-│ ├── schemas.py # Pydantic request/response models
-│ ├── model_loader.py # Loads and caches the CatBoost model
-│ └── config.py # Paths, thresholds, column order
+│ ├── main.py # FastAPI-приложение, эндпоинты /predict и /health
+│ ├── schemas.py # Pydantic-модели запроса/ответа
+│ ├── model_loader.py # Загрузка и кэширование модели CatBoost
+│ └── config.py # Пути, пороги, порядок колонок
 ├── data/
-│ ├── raw/ # Original dataset
-│ └── processed/ # Cleaned dataset used for training
-├── models/ # Trained CatBoost model (.cbm)
+│ ├── raw/ # Исходный датасет
+│ └── processed/ # Обработанный датасет для обучения
+├── models/ # Обученная модель CatBoost (.cbm)
 ├── notebooks/
-│ ├── 01_EDA.ipynb # Exploratory data analysis
-│ └── 02_modeling.ipynb # Baseline, CatBoost, tuning, SHAP
+│ ├── 01_EDA.ipynb # Разведочный анализ данных
+│ └── 02_modeling.ipynb # Baseline, CatBoost, тюнинг, SHAP
 ├── tests/
-│ └── test_api.py # API tests (pytest)
+│ └── test_api.py # Тесты API (pytest)
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
 
-
-
-## Running Locally
+## Запуск локально
 
 ```bash
 pip install -r requirements.txt
 python -m app.main
 ```
 
-API available at `http://127.0.0.1:8000`, interactive docs at `http://127.0.0.1:8000/docs`.
+API доступен на `http://127.0.0.1:8000`, интерактивная документация — `http://127.0.0.1:8000/docs`.
 
-## Running with Docker
+## Запуск через Docker
 
 ```bash
 docker compose up --build
 ```
 
-## API Usage
+## Использование API
 
 **POST /predict**
 
@@ -92,7 +90,7 @@ curl -X POST 'http://127.0.0.1:8000/predict' \
   }'
 ```
 
-Response:
+Ответ:
 ```json
 {
   "creditability": 1,
@@ -101,21 +99,21 @@ Response:
 }
 ```
 
-**GET /health** — service liveness check.
+**GET /health** — проверка живости сервиса.
 
-## Tests
+## Тесты
 
 ```bash
 pytest tests/ -v
 ```
 
-Covers health check, valid/invalid payloads, field validation, and risk-level threshold consistency.
+Покрывают: health check, валидные/невалидные запросы, валидацию полей, согласованность risk_level с порогами.
 
-## Tech Stack
+## Стек технологий
 
 Python, pandas, scikit-learn, CatBoost, SHAP, FastAPI, Pydantic, pytest, Docker
 
-## Notes
+## Примечания
 
-- `occupation`, `payment_status_of_previous_credit`, `value_savings_stocks`, and `concurrent_credits` contain a code value of `99` in the source data (likely "unknown"); this is preserved as a valid category rather than imputed, since CatBoost handles it natively as a category and it affects a small fraction of records.
-- Feature engineering experiments (removing low-SHAP-importance features, adding a manual interaction feature) did not meaningfully improve metrics beyond the tuned baseline — consistent with CatBoost's ability to learn interactions natively on tree splits.
+- `occupation`, `payment_status_of_previous_credit`, `value_savings_stocks` и `concurrent_credits` содержат код `99` в исходных данных (вероятно, "неизвестно"); это значение сохранено как валидная категория, а не импутировано — CatBoost сам обрабатывает его как отдельную категорию, и оно затрагивает малую долю записей.
+- Эксперименты с feature engineering (удаление слабых по SHAP фич, добавление ручной интеракции) не дали значимого улучшения метрик сверх tuned-baseline — что согласуется со способностью CatBoost находить взаимодействия фич самостоятельно через сплиты деревьев.
